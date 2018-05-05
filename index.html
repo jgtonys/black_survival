@@ -1,0 +1,40 @@
+<html>
+<head>
+  <title>b</title>
+  <link href='css/vuetify_font.css' rel="stylesheet">
+  <link href="css/vuetify.min.css" rel="stylesheet">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/ />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  <script type="text/javascript" src="script/vue.js"></script>
+  <script type="text/javascript" src="script/vuex.js"></script>
+  <script type="text/javascript" src="script/item.js"></script>
+  <script type="text/javascript" src="script/components.js"></script>
+  <body>
+    <div id="main">
+      <v-app>
+        <v-container fluid>
+         <v-layout row>
+           <v-flex xs6 order-lg2 align-center>
+             <v-card tile flat height="80%">
+               <v-card-title>Area #{{ loca }}</v-card-title>
+               <component :is="view"></component>
+             </v-card>
+           </v-flex>
+           <v-flex xs6>
+             <v-card tile flat height="80%">
+               <user_stat></user_stat>
+               <main_button></main_button>
+               <inventory></inventory>
+             </v-card>
+           </v-flex>
+         </v-layout>
+      </v-container>
+      </v-app>
+    </div>
+  <script type="text/javascript" src="data.json"></script>
+  <script type="text/javascript" src="script/store.js"></script>
+  <script src="script/vuetify.js"></script>
+  <script type="text/javascript" src="script/main.js"></script>
+  </body>
+</head>
+</html>

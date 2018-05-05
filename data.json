@@ -1,0 +1,11 @@
+list = [
+    {"id":0,"name":"물","prop":"consume","consumeDetail":"sta","consumeAmount":3,"upgradeTo":3},
+    {"id":1,"name":"빵 조각","prop":"consume","consumeDetail":"hp","consumeAmount":3},
+    {"id":2,"name":"페트병","prop":"material","upgradeTo":3},
+    {"id":3,"name":"물병","prop":"consume","consumeDetail":"sta","consumeAmount":20,"recipe":[
+      {"id":0,"ct":3},{"id":2,"ct":1}
+      ]},
+    {"id":4,"name":"접시","prop":"material","upgradeTo":""},
+    {"id":5,"name":"잡초","prop":"consume","consumeDetail":["hp","sta"],"consumeAmount":[3,2]},
+    {"id":6,"name":"펜","prop":"weapon","atk":10}
+  ]
