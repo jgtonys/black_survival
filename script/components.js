@@ -31,49 +31,59 @@ Vue.component('inventory', {
     <div v-for="(item,index) in bag">
     <v-btn
       depressed
-      @click="clickDialog"
+      @click.stop="clickDialog(index)"
       color="primary"
       dark
     >{{ item.name }}</v-btn>
-    <v-dialog v-model="dialog[index]" max-width="290">
+    </div>
+    <v-dialog v-model="openDialog" max-width="290">
       <v-card>
-        <v-card-title class="headline">{{ item.prop }}</v-card-title>
+        <v-card-title class="headline">{{ itemProperty.name }}</v-card-title>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="green darken-1" flat @click.native="use(index)">사용</v-btn>
-          <v-btn color="green darken-1" flat @click.native="remove(index)">버리기</v-btn>
+          <v-btn color="green darken-1" flat @click.native="use">사용</v-btn>
+          <v-btn color="green darken-1" flat @click.native="remove">버리기</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-    </div>
   </div>
   `,
   data() {
     return {
-      dialog: [false,false,false,false,false]
+      openDialog: false,
+      currentItemIndex: 0
     }
   },
   methods: {
-    use(i) {
-      this.dialog[i] = false;
+    use() {
+      let i = this.currentItemIndex;
       user_info.commit('changeStat',i);
       user_info.commit('useItem',i);
-      console.log("dialog" + i + "open");
-      console.log(this.dialog)
+      this.openDialog = false;
     },
-    remove(i) {
-      this.dialog[i] = false;
+    remove() {
+      let i = this.currentItemIndex;
       user_info.commit('removeItem',i);
+      this.openDialog = false;
     },
     clickDialog(i) {
-      this.dialog[i] = true;
-      console.log("blabla");
+      this.openDialog = true;
+      this.currentItemIndex = i;
     }
   },
   computed: {
     bag() {
       return user_info.getters.bagList
     },
+    itemProperty() {
+      let itemList = user_info.getters.bagList
+      if(itemList.length == 0) {
+        return {name:""}
+      } else {
+        return itemList[this.currentItemIndex]
+      }
+
+    }
   }
 
 })
