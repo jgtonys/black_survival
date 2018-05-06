@@ -18,18 +18,13 @@ const user_info = new Vuex.Store({
     changeLoca (state,loca) {
       state.loca = loca;
     },
-    changeStat (state,index) {
-      let item = state.bag[index];
-      console.log(item)
-      if(item.prop == "consume"){
-        for(let l=0;l<item.consumeDetail.length;l++) {
-          if(item.consumeDetail[l] == "hp"){
-            state.hp += parseInt(item.consumeAmount[l]);
-          } else if(item.consumeDetail[l] == "sta"){
-            state.sta += parseInt(item.consumeAmount[l]);
-          }
-        }
-      }
+    changeSta (state,amount) {
+      console.log("sta change");
+      state.sta += parseInt(amount);
+    },
+    changeHp (state,amount) {
+      console.log("hp change");
+      state.hp += parseInt(amount);
     }
   },
   getters: {
@@ -73,6 +68,11 @@ const sys_info = new Vuex.Store({
     },
     getItemList: state => {
       return state.itemList
+    },
+    getFilterItem: state => {
+      return id => state.itemList.filter(item => {
+        return item.id == id
+      })
     }
   }
 })

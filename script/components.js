@@ -39,10 +39,24 @@ Vue.component('inventory', {
     <v-dialog v-model="openDialog" max-width="290">
       <v-card>
         <v-card-title class="headline">{{ itemProperty.name }}</v-card-title>
+        <div v-if="itemProperty.prop.includes('consume')">
+          <v-card-title v-for="detail in itemProperty.consumeDetail" class="subheading">{{ detail }}</v-card-title>
+        </div>
+        <div v-if="itemProperty.prop.includes('material')">
+          <v-card-title class="subheading">조합표</v-card-title>
+          <v-btn-toggle v-model="selected_make" depressed>
+            <v-btn v-for="(item,index) in itemProperty.make"
+              color="blue darken-1"
+              flat
+            >{{ item.name }}</v-btn>
+          </v-btn-toggle>
+        </div>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="green darken-1" flat @click.native="use">사용</v-btn>
-          <v-btn color="green darken-1" flat @click.native="remove">버리기</v-btn>
+          <v-btn v-if="itemProperty.prop.includes('consume')" color="green darken-1" flat @click="use">사용</v-btn>
+          <v-btn v-if="itemProperty.prop.includes('material')" color="green darken-1" flat @click="make">조합</v-btn>
+          <v-btn v-if="itemProperty.prop.includes('weapon')" color="green darken-1" flat @click="equip">장착</v-btn>
+          <v-btn color="green darken-1" flat @click="remove">버리기</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -51,15 +65,28 @@ Vue.component('inventory', {
   data() {
     return {
       openDialog: false,
-      currentItemIndex: 0
+      currentItemIndex: 0,
+      itemProperty: {
+        name: '',
+        prop: '',
+        consumeDetail: [],
+        make: []
+      },
+      selected_make: null
     }
   },
   methods: {
     use() {
       let i = this.currentItemIndex;
-      user_info.commit('changeStat',i);
+      itemUse(user_info.getters.bagList[i])
       user_info.commit('useItem',i);
       this.openDialog = false;
+    },
+    make() {
+      console.log(this.selected_make);
+    },
+    equip() {
+      console.log("equip!");
     },
     remove() {
       let i = this.currentItemIndex;
@@ -69,20 +96,34 @@ Vue.component('inventory', {
     clickDialog(i) {
       this.openDialog = true;
       this.currentItemIndex = i;
+      let item = user_info.getters.bagList[i];
+      this.itemProperty.name = item.name;
+      this.itemProperty.prop = item.prop;
+      this.itemProperty.make = [];
+      this.itemProperty.consumeDetail = [];
+      if(item.prop.includes('material')) {
+        for(let i=0;i<item.upgradeTo.length;i++) {
+          this.itemProperty.make.push(sys_info.getters.getFilterItem(item.upgradeTo[i])[0]);
+        }
+        console.log(this.itemProperty.make);
+      }
+      if(item.prop.includes('consume')) {
+        for(let i=0;i<item.consumeDetail.length;i++) {
+          switch(item.consumeDetail[i]) {
+            case 'sta':
+              this.itemProperty.consumeDetail.push("스테미너 +" + item.consumeAmount[i]);
+              break;
+            case 'hp':
+              this.itemProperty.consumeDetail.push("체력 +" + item.consumeAmount[i]);
+              break;
+          }
+        }
+      }
     }
   },
   computed: {
     bag() {
       return user_info.getters.bagList
-    },
-    itemProperty() {
-      let itemList = user_info.getters.bagList
-      if(itemList.length == 0) {
-        return {name:""}
-      } else {
-        return itemList[this.currentItemIndex]
-      }
-
     }
   }
 
@@ -98,7 +139,7 @@ Vue.component('item_occur', {
   `,
   methods: {
     item_get() {
-      if(user_info.getters.bagLength == 5) {alert("가방에 공간 부족!")}
+      if(user_info.getters.bagLength == 15) {alert("가방에 공간 부족!")}
       else {user_info.commit('pushItem',this.item)}
       sys_info.commit('clearView');
     },
