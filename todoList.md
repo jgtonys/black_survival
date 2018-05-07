@@ -8,9 +8,11 @@
 
 # item depletion in map [finished]
 
+# item cooltime apply [finished]
 
 
-# item cooltime apply
+
+# DESIGN!!
 
 
 # equipment status show in dialog

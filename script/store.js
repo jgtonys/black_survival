@@ -4,7 +4,8 @@ const user_info = new Vuex.Store({
     loca: 1,
     hp: 100,
     sta: 100,
-    notFind: 20
+    notFind: 20,
+    atk: 5
   },
   mutations: {
     pushItem (state,item) {
@@ -44,6 +45,9 @@ const user_info = new Vuex.Store({
     },
     getSta: state => {
       return state.sta
+    },
+    getAtk: state => {
+      return state.atk
     },
     getMissRate: state => {
       return state.notFind
@@ -85,6 +89,43 @@ const sys_info = new Vuex.Store({
     },
     getFilterItemMap: state => {
       return state.itemMapSet
+    }
+  }
+})
+
+const time_info = new Vuex.Store({
+  state: {
+    itemCoolTime: false,
+    itemCoolTimeLeft: 0
+  },
+  mutations: {
+    setItemCoolTime (state,payload) {
+      state.itemCoolTime = payload[0];
+      state.itemCoolTimeLeft = payload[1];
+    },
+    cutItemCoolTimeLeft (state) {
+      state.itemCoolTimeLeft -= 1;
+    }
+  },
+  actions: { //action can only use one payload, so make it list
+    setItemCoolAction({commit},ct) {
+      let coolTime = ct;
+      commit('setItemCoolTime',[true,coolTime]);
+      let t = setInterval(() => {
+        commit('cutItemCoolTimeLeft')
+      },1000);
+      setTimeout(() => {
+        commit('setItemCoolTime',[false,0]);
+        clearInterval(t);
+      }, coolTime*1000);
+    }
+  },
+  getters: {
+    getItemCoolTime: state => {
+      return state.itemCoolTime
+    },
+    getItemCoolTimeLeft: state => {
+      return state.itemCoolTimeLeft
     }
   }
 })

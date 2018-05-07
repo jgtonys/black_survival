@@ -10,8 +10,10 @@ Vue.component('user_stat', {
   template: `
   <div>
     <v-card-text>
-      <p class="text-sm-left">hp : {{ hp }}</p>
-      <p class="text-sm-left">sta : {{ sta }}</p>
+      <p class="text-sm-left my-0">hp : {{ hp }}</p>
+      <p class="text-sm-left my-0">sta : {{ sta }}</p>
+      <p class="text-sm-left my-0">atk : {{ atk }}</p>
+      <p v-if="isConsumeCool" class="text-sm-left my-0">소비아이템 재사용 대기시간 : {{ consumeCool }}</p>
     </v-card-text>
   </div>
   `,
@@ -21,6 +23,15 @@ Vue.component('user_stat', {
     },
     sta() {
       return user_info.getters.getSta
+    },
+    atk() {
+      return user_info.getters.getAtk
+    },
+    consumeCool() {
+      return time_info.getters.getItemCoolTimeLeft
+    },
+    isConsumeCool() {
+      return time_info.getters.getItemCoolTime
     }
   }
 })
@@ -48,12 +59,13 @@ Vue.component('inventory', {
       <v-card>
         <v-card-title class="headline">{{ itemProperty.name }}</v-card-title>
         <div v-if="itemProperty.prop.includes('consume')">
-          <v-card-title v-for="detail in itemProperty.consumeDetail" :key="detail" class="subheading">{{ detail }}</v-card-title>
+          <v-card-text v-for="detail in itemProperty.consumeDetail" :key="detail" class="subheading py-0">{{ detail }}</v-card-text>
         </div>
         <div v-if="itemProperty.prop.includes('material')">
-          <v-card-title class="subheading">조합표</v-card-title>
+          <v-card-title class="subheading py-0">조합표</v-card-title>
           <v-btn-toggle v-model="selected_make" depressed>
             <v-btn v-for="(item,index) in itemProperty.make"
+              class="pa-16"
               :key="item.name"
               color="blue darken-1"
               flat
@@ -66,7 +78,14 @@ Vue.component('inventory', {
         </div>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn v-if="itemProperty.prop.includes('consume')" color="green darken-1" flat @click="use">사용</v-btn>
+          <v-btn
+            :loading="itemCoolTime"
+            :disabled="itemCoolTime"
+            v-if="itemProperty.prop.includes('consume')"
+            color="green darken-1"
+            flat
+            @click="use"
+          >사용<span slot="loader">{{ itemCoolTimeLeft }}초 남음</span></v-btn>
           <v-btn v-if="itemProperty.prop.includes('material')" color="green darken-1" flat @click="make">조합</v-btn>
           <v-btn v-if="itemProperty.prop.includes('weapon')" color="green darken-1" flat @click="equip">장착</v-btn>
           <v-btn color="green darken-1" flat @click="remove">버리기</v-btn>
@@ -95,9 +114,11 @@ Vue.component('inventory', {
   methods: {
     use() {
       let i = this.currentItemIndex;
-      itemUse(user_info.getters.bagList[i])
+      let item = user_info.getters.bagList[i];
+      itemUse(item)
       user_info.commit('useItem',i);
       this.openDialog = false;
+      time_info.dispatch("setItemCoolAction",item.coolTime);
     },
     make() {
       if(this.selected_make != null && this.canMakeRecipe) {
@@ -110,8 +131,10 @@ Vue.component('inventory', {
           user_info.commit("deleteItem",dlist[i]);
         }
         user_info.commit("pushItem",this.itemProperty.make[this.selected_make]);
+      } else if(this.selected_make == null) {
+        alert("선택된 조합 없음");
       } else {
-        alert("만들 수 없음!");
+        alert("재료 부족!")
       }
       this.openDialog = false;
     },
@@ -213,6 +236,12 @@ Vue.component('inventory', {
       } else {
         return [windowBag,overlapCt,realIndex]
       }
+    },
+    itemCoolTime() {
+      return time_info.getters.getItemCoolTime
+    },
+    itemCoolTimeLeft() {
+      return time_info.getters.getItemCoolTimeLeft
     }
   }
 
