@@ -29,24 +29,32 @@ Vue.component('inventory', {
   template: `
   <div>
     <div>
-    <v-btn
-      v-for="(item,index) in bag"
-      depressed
-      @click.stop="clickDialog(index)"
-      color="primary"
-      dark
-    >{{ item.name }}</v-btn>
+        <v-btn
+          v-for="(item,index) in overlapBag[0]"
+          :key="item.name"
+          depressed
+          outline
+          flat
+          @click.stop="clickDialog(overlapBag[2][index])"
+          :color="colorByRarity(item.rarity)"
+          dark
+        >{{ item.name }}
+        <template v-if="overlapBag[1][index] != 1">
+        ({{ overlapBag[1][index] }})
+        </template>
+        </v-btn>
     </div>
     <v-dialog v-model="openDialog" max-width="500">
       <v-card>
         <v-card-title class="headline">{{ itemProperty.name }}</v-card-title>
         <div v-if="itemProperty.prop.includes('consume')">
-          <v-card-title v-for="detail in itemProperty.consumeDetail" class="subheading">{{ detail }}</v-card-title>
+          <v-card-title v-for="detail in itemProperty.consumeDetail" :key="detail" class="subheading">{{ detail }}</v-card-title>
         </div>
         <div v-if="itemProperty.prop.includes('material')">
           <v-card-title class="subheading">조합표</v-card-title>
           <v-btn-toggle v-model="selected_make" depressed>
             <v-btn v-for="(item,index) in itemProperty.make"
+              :key="item.name"
               color="blue darken-1"
               flat
               @click = "showRecipe(item)"
@@ -168,11 +176,43 @@ Vue.component('inventory', {
         this.canMakeRecipe = true;
       }
       this.toggleRecipe = true;
+    },
+    colorByRarity(r) {
+      if(r > 40) {
+        return "black"
+      } else if(r > 20) {
+        return "brown"
+      } else if(r >10) {
+        return "indigo"
+      } else {
+        return "deep-purple"
+      }
     }
   },
   computed: {
     bag() {
       return user_info.getters.bagList
+    },
+    overlapBag() {
+      let bag = this.bag;
+      let windowBag = [];
+      let overlapCt = [];
+      let realIndex = [];
+      for(let i=0;i<bag.length;i++) {
+        let f = windowBag.indexOf(bag[i])
+        if(f == -1) {
+          windowBag.push(bag[i]);
+          overlapCt.push(1);
+          realIndex.push(i);
+        } else {
+          overlapCt[f] += 1;
+        }
+      }
+      if(windowBag.length == 0) {
+        return ""
+      } else {
+        return [windowBag,overlapCt,realIndex]
+      }
     }
   }
 
@@ -182,10 +222,17 @@ Vue.component('item_occur', {
   template: `
   <div class="text-xs-center">
     <v-card-title>{{ item.name }}</v-card-title>
-    <v-btn @click="item_get">획득</v-btn>
-    <v-btn @click="item_neglect">버리기</v-btn>
+    <template v-if="!depletion">
+      <v-btn @click="item_get">획득</v-btn>
+      <v-btn @click="item_neglect">버리기</v-btn>
+    </template>
   </div>
   `,
+  data() {
+    return {
+      depletion: false
+    }
+  },
   methods: {
     item_get() {
       if(user_info.getters.bagLength == 15) {alert("가방에 공간 부족!")}
@@ -198,7 +245,14 @@ Vue.component('item_occur', {
   },
   computed: {
     item() {
-      return itemFind(user_info.getters.userLoca)
+      let i = itemFind(user_info.getters.userLoca);
+      if(!i) {
+        this.depletion = true;
+        return {name:"여기엔 더이상 아이템이 존재하지 않습니다."}
+      } else {
+        if(this.depletion == true) {this.depletion = false;}
+        return i
+      }
     }
   }
 })

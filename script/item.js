@@ -1,5 +1,9 @@
 function itemFind(index) {
   let l = sys_info.getters.getFilterItemMap[index];
+  if(l.length == 0) {
+    console.log("더이상 아이템이 없습니다.");
+    return false
+  }
   return l.pop();
 }
 
