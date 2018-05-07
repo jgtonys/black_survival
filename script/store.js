@@ -1,9 +1,10 @@
 const user_info = new Vuex.Store({
   state: {
     bag: [],
-    loca: 0,
+    loca: 1,
     hp: 100,
-    sta: 100
+    sta: 100,
+    notFind: 20
   },
   mutations: {
     pushItem (state,item) {
@@ -15,15 +16,16 @@ const user_info = new Vuex.Store({
     removeItem (state,index) {
       state.bag.splice(index,1);
     },
+    deleteItem (state,item) {
+      let t = state.bag.splice(state.bag.indexOf(item),1);
+    },
     changeLoca (state,loca) {
       state.loca = loca;
     },
     changeSta (state,amount) {
-      console.log("sta change");
       state.sta += parseInt(amount);
     },
     changeHp (state,amount) {
-      console.log("hp change");
       state.hp += parseInt(amount);
     }
   },
@@ -42,6 +44,9 @@ const user_info = new Vuex.Store({
     },
     getSta: state => {
       return state.sta
+    },
+    getMissRate: state => {
+      return state.notFind
     }
   }
 })
@@ -49,7 +54,8 @@ const user_info = new Vuex.Store({
 const sys_info = new Vuex.Store({
   state: {
     view: '',
-    itemList: []
+    itemList: [],
+    itemMapSet: []
   },
   mutations: {
     clearView (state) {
@@ -60,6 +66,9 @@ const sys_info = new Vuex.Store({
     },
     setItemList (state, list) {
       state.itemList = list
+    },
+    setItemMap (state, list) {
+      state.itemMapSet = list
     }
   },
   getters: {
@@ -73,6 +82,9 @@ const sys_info = new Vuex.Store({
       return id => state.itemList.filter(item => {
         return item.id == id
       })
+    },
+    getFilterItemMap: state => {
+      return state.itemMapSet
     }
   }
 })

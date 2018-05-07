@@ -1,11 +1,17 @@
 list = [
-    {"id":0,"name":"물","prop":["consume","material"],"consumeDetail":["sta"],"consumeAmount":[3],"upgradeTo":[3]},
-    {"id":1,"name":"빵 조각","prop":["consume"],"consumeDetail":["hp"],"consumeAmount":[3]},
-    {"id":2,"name":"페트병","prop":["material"],"upgradeTo":[3]},
-    {"id":3,"name":"물병","prop":["consume"],"consumeDetail":["sta"],"consumeAmount":[20],"recipe":[
+    {"id":0,"rarity":50,"gen":[1],"name":"물","prop":["consume","material"],"consumeDetail":["sta"],"consumeAmount":[3],"upgradeTo":[3,8]},
+    {"id":1,"rarity":20,"gen":[1],"name":"빵 조각","prop":["consume","material"],"consumeDetail":["hp"],"consumeAmount":[3],"upgradeTo":[7,8]},
+    {"id":2,"rarity":25,"gen":[1],"name":"페트병","prop":["material"],"upgradeTo":[3]},
+    {"id":3,"rarity":5,"gen":[2],"name":"물병","prop":["consume"],"consumeDetail":["sta"],"consumeAmount":[20],"recipe":[
       {"id":0,"ct":3},{"id":2,"ct":1}
       ]},
-    {"id":4,"name":"접시","prop":["material"],"upgradeTo":[6,5]},
-    {"id":5,"name":"잡초","prop":["consume"],"consumeDetail":["hp","sta"],"consumeAmount":[3,2]},
-    {"id":6,"name":"펜","prop":["weapon"],"atk":10}
+    {"id":4,"rarity":30,"gen":[1],"name":"접시","prop":["material"],"upgradeTo":[7]},
+    {"id":5,"rarity":40,"gen":[1],"name":"잡초","prop":["consume"],"consumeDetail":["hp","sta"],"consumeAmount":[3,2]},
+    {"id":6,"rarity":20,"gen":[4],"name":"펜","prop":["weapon"],"atk":10},
+    {"id":7,"rarity":10,"gen":[3],"name":"접시에 담긴 빵","prop":["consume"],"consumeDetail":["hp"],"consumeAmount":[20],"recipe":[
+      {"id":1,"ct":1},{"id":4,"ct":1}
+      ]},
+    {"id":8,"rarity":10,"gen":[5],"name":"물빵","prop":["consume"],"consumeDetail":["hp","sta"],"consumeAmount":[10,5],"recipe":[
+      {"id":0,"ct":2},{"id":1,"ct":1}
+      ]},
   ]

@@ -12,22 +12,35 @@
   <body>
     <div id="main">
       <v-app>
-        <v-container fluid>
-         <v-layout row>
-           <v-flex xs6 order-lg2 align-center>
-             <v-card tile flat height="80%">
-               <v-card-title>Area #{{ loca }}</v-card-title>
-               <component :is="view"></component>
-             </v-card>
-           </v-flex>
-           <v-flex xs6>
-             <v-card tile flat height="80%">
-               <user_stat></user_stat>
-               <main_button></main_button>
-               <inventory></inventory>
-             </v-card>
-           </v-flex>
-         </v-layout>
+      <v-container fluid grid-list-sm>
+        <v-layout row wrap>
+          <v-flex d-flex xs12>
+              <v-flex d-flex xs12>
+                <v-card tile flat height="80%">
+                  <v-card-title>Area #{{ loca }}</v-card-title>
+                  <component :is="view"></component>
+                </v-card>
+              </v-flex>
+              <v-layout column xs2>
+                <v-flex d-flex xs5>
+                  <v-card tile flat>
+                    <v-card-text><user_stat></user_stat></v-card-text>
+                  </v-card>
+                </v-flex>
+                <v-flex d-flex xs5>
+                  <v-card tile flat>
+                    <main_button></main_button>
+                  </v-card>
+                </v-flex>
+              </v-layout>
+          </v-flex>
+        </v-layout>
+        <v-flex d-flex xs12>
+          <v-card tile flat>
+            <v-card-text><inventory></inventory></v-card-text>
+          </v-card>
+        </v-flex>
+
       </v-container>
       </v-app>
     </div>

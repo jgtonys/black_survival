@@ -28,15 +28,16 @@ Vue.component('user_stat', {
 Vue.component('inventory', {
   template: `
   <div>
-    <div v-for="(item,index) in bag">
+    <div>
     <v-btn
+      v-for="(item,index) in bag"
       depressed
       @click.stop="clickDialog(index)"
       color="primary"
       dark
     >{{ item.name }}</v-btn>
     </div>
-    <v-dialog v-model="openDialog" max-width="290">
+    <v-dialog v-model="openDialog" max-width="500">
       <v-card>
         <v-card-title class="headline">{{ itemProperty.name }}</v-card-title>
         <div v-if="itemProperty.prop.includes('consume')">
@@ -48,8 +49,12 @@ Vue.component('inventory', {
             <v-btn v-for="(item,index) in itemProperty.make"
               color="blue darken-1"
               flat
+              @click = "showRecipe(item)"
             >{{ item.name }}</v-btn>
           </v-btn-toggle>
+          <v-card-text v-if="toggleRecipe" class="subheading">
+            <p v-for="r in recipe">{{ r }}</p>
+          </v-card-text>
         </div>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -72,7 +77,11 @@ Vue.component('inventory', {
         consumeDetail: [],
         make: []
       },
-      selected_make: null
+      selected_make: null,
+      recipe: [],
+      toggleRecipe: false,
+      canMakeRecipe: false,
+      materialsToDelete: []
     }
   },
   methods: {
@@ -83,7 +92,20 @@ Vue.component('inventory', {
       this.openDialog = false;
     },
     make() {
-      console.log(this.selected_make);
+      if(this.selected_make != null && this.canMakeRecipe) {
+        let d = this.materialsToDelete;
+        let dlist = []
+        for(let i=0;i<d.length;i++) {
+          dlist.push(this.bag[d[i]]);
+        }
+        for(let i=0;i<dlist.length;i++) {
+          user_info.commit("deleteItem",dlist[i]);
+        }
+        user_info.commit("pushItem",this.itemProperty.make[this.selected_make]);
+      } else {
+        alert("만들 수 없음!");
+      }
+      this.openDialog = false;
     },
     equip() {
       console.log("equip!");
@@ -95,6 +117,10 @@ Vue.component('inventory', {
     },
     clickDialog(i) {
       this.openDialog = true;
+      this.selected_make = null;
+      this.toggleRecipe = false;
+      this.canMakeRecipe = false;
+      this.materialsToDelete = [];
       this.currentItemIndex = i;
       let item = user_info.getters.bagList[i];
       this.itemProperty.name = item.name;
@@ -105,7 +131,6 @@ Vue.component('inventory', {
         for(let i=0;i<item.upgradeTo.length;i++) {
           this.itemProperty.make.push(sys_info.getters.getFilterItem(item.upgradeTo[i])[0]);
         }
-        console.log(this.itemProperty.make);
       }
       if(item.prop.includes('consume')) {
         for(let i=0;i<item.consumeDetail.length;i++) {
@@ -119,6 +144,30 @@ Vue.component('inventory', {
           }
         }
       }
+    },
+    showRecipe(item) {
+      this.recipe = [];
+      this.materialsToDelete = [];
+      this.canMakeRecipe = false;
+      let sct = 0
+      for(let i=0;i<item.recipe.length;i++) {
+        let objectMaterial = sys_info.getters.getFilterItem(item.recipe[i].id)[0]
+        let text = objectMaterial.name + " " + item.recipe[i].ct + "개"
+        let bagCount = this.bag.map((e, i) => e === objectMaterial ? i: '').filter(String);
+        let needCount = parseInt(item.recipe[i].ct)
+        if(bagCount.length >= needCount) {
+          text += " (완)";
+          sct += 1;
+          this.materialsToDelete = this.materialsToDelete.concat(bagCount.slice(0,needCount));
+        } else {
+          text += " (미완 현재" + bagCount.length + "개 소지)";
+        }
+        this.recipe.push(text);
+      }
+      if(item.recipe.length == sct) {
+        this.canMakeRecipe = true;
+      }
+      this.toggleRecipe = true;
     }
   },
   computed: {
@@ -149,7 +198,7 @@ Vue.component('item_occur', {
   },
   computed: {
     item() {
-      return itemFind()
+      return itemFind(user_info.getters.userLoca)
     }
   }
 })
@@ -191,7 +240,7 @@ Vue.component('main_button', {
       sys_info.commit("changeView",'move_area');
     },
     search_fn() {
-      if(Math.floor(Math.random()*10 > 3)) {
+      if(Math.floor(Math.random()*10 > 2)) {
         sys_info.commit("changeView",'item_occur');
       } else {
         sys_info.commit("changeView",'not_found');
