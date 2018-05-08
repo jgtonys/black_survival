@@ -10,10 +10,23 @@ Vue.component('user_stat', {
   template: `
   <div>
     <v-card-text>
-      <p class="text-sm-left my-0">hp : {{ hp }}</p>
-      <p class="text-sm-left my-0">sta : {{ sta }}</p>
+      <p class="text-sm-left my-0">
+        <v-progress-linear v-model="hp" height="2" color="pink dark" background-color="pink lighten-3"></v-progress-linear>
+      </p>
+      <p class="text-sm-left my-0">
+        <v-progress-linear v-model="sta" height="2" color="blue dark" background-color="blue-grey"></v-progress-linear>
+      </p>
       <p class="text-sm-left my-0">atk : {{ atk }}</p>
-      <p v-if="isConsumeCool" class="text-sm-left my-0">소비아이템 재사용 대기시간 : {{ consumeCool }}</p>
+      <v-progress-circular
+        v-if="isConsumeCool"
+        :size="50"
+        :width="10"
+        :rotate="-90"
+        :value="consumeCoolPercent"
+        color="teal"
+    >
+      {{ consumeCool }}
+    </v-progress-circular>
     </v-card-text>
   </div>
   `,
@@ -32,6 +45,9 @@ Vue.component('user_stat', {
     },
     isConsumeCool() {
       return time_info.getters.getItemCoolTime
+    },
+    consumeCoolPercent() {
+      return (this.consumeCool / time_info.getters.getItemCoolTimeDefault)*100
     }
   }
 })
@@ -44,10 +60,10 @@ Vue.component('inventory', {
           v-for="(item,index) in overlapBag[0]"
           :key="item.name"
           depressed
-          outline
-          flat
+          :outline="sBI(item)"
           @click.stop="clickDialog(overlapBag[2][index])"
-          :color="colorByRarity(item.rarity)"
+          :color="cBR(item)"
+          class="animated lightSpeedIn"
           dark
         >{{ item.name }}
         <template v-if="overlapBag[1][index] != 1">
@@ -55,27 +71,33 @@ Vue.component('inventory', {
         </template>
         </v-btn>
     </div>
-    <v-dialog v-model="openDialog" max-width="500">
+    <v-dialog v-model="openDialog" max-width="600">
       <v-card>
-        <v-card-title class="headline">{{ itemProperty.name }}</v-card-title>
-        <div v-if="itemProperty.prop.includes('consume')">
-          <v-card-text v-for="detail in itemProperty.consumeDetail" :key="detail" class="subheading py-0">{{ detail }}</v-card-text>
-        </div>
-        <div v-if="itemProperty.prop.includes('material')">
-          <v-card-title class="subheading py-0">조합표</v-card-title>
-          <v-btn-toggle v-model="selected_make" depressed>
-            <v-btn v-for="(item,index) in itemProperty.make"
-              class="pa-16"
-              :key="item.name"
-              color="blue darken-1"
-              flat
-              @click = "showRecipe(item)"
-            >{{ item.name }}</v-btn>
-          </v-btn-toggle>
-          <v-card-text v-if="toggleRecipe" class="subheading">
-            <p v-for="r in recipe">{{ r }}</p>
-          </v-card-text>
-        </div>
+        <v-layout row wrap>
+          <v-flex>
+            <v-card tile flat>
+              <v-card-title class="headline">{{ itemProperty.name }}</v-card-title>
+              <template v-if="itemProperty.prop.includes('consume')">
+                <v-card-text v-for="detail in itemProperty.consumeDetail" :key="detail" class="subheading py-0">{{ detail }}</v-card-text>
+              </template>
+            </v-card>
+          </v-flex>
+          <v-flex>
+            <template v-if="itemProperty.prop.includes('material')">
+              <v-btn-toggle v-model="selected_make" depressed class="ma-16">
+                <v-btn v-for="(item,index) in itemProperty.make"
+                  :key="item.name"
+                  color="blue darken-1"
+                  flat
+                  @click = "showRecipe(item)"
+                >{{ item.name }}</v-btn>
+              </v-btn-toggle>
+              <template v-if="toggleRecipe" class="caption">
+                <p v-for="r in recipe">{{ r }}</p>
+              </template>
+            </template>
+          </v-flex>
+        </v-layout>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
@@ -139,7 +161,11 @@ Vue.component('inventory', {
       this.openDialog = false;
     },
     equip() {
-      console.log("equip!");
+      let i = this.currentItemIndex;
+      let item = user_info.getters.bagList[i];
+      user_info.commit('useItem',i);
+      user_info.commit("changeEquip",item);
+      this.openDialog = false;
     },
     remove() {
       let i = this.currentItemIndex;
@@ -200,16 +226,11 @@ Vue.component('inventory', {
       }
       this.toggleRecipe = true;
     },
-    colorByRarity(r) {
-      if(r > 40) {
-        return "black"
-      } else if(r > 20) {
-        return "brown"
-      } else if(r >10) {
-        return "indigo"
-      } else {
-        return "deep-purple"
-      }
+    cBR(i) {
+      return colorByRarity(i)
+    },
+    sBI(i) {
+      return styleByItem(i)
     }
   },
   computed: {
@@ -249,7 +270,7 @@ Vue.component('inventory', {
 
 Vue.component('item_occur', {
   template: `
-  <div class="text-xs-center">
+  <div class="animated fadeInLeft text-xs-center">
     <v-card-title>{{ item.name }}</v-card-title>
     <template v-if="!depletion">
       <v-btn @click="item_get">획득</v-btn>
@@ -294,6 +315,106 @@ Vue.component('not_found', {
   `
 })
 
+Vue.component('test', {
+  template: `
+  <div>
+    <v-container fluid grid-list-md>
+      <v-layout row wrap>
+        <v-flex d-flex xs12 sm6 md4>
+          <v-card>
+            <v-card-title primary class="title">장비</v-card-title>
+            <template>
+              <v-container fluid grid-list-xl>
+                <v-layout row row>
+                  <v-btn depressed :outline="sBI(equip.weapon)" :color="cBR(equip.weapon)" class="animated fadeIn" dark>
+                    <template v-if="equip.weapon">{{ equip.weapon.name }}</template>
+                    <template v-else>무기</template>
+                  </v-btn>
+                  <v-btn depressed :outline="sBI(equip.head)" :color="cBR(equip.head)" class="animated fadeIn" dark>
+                    <template v-if="equip.head">{{ equip.head.name }}</template>
+                    <template v-else>머리</template>
+                  </v-btn>
+                </v-layout>
+                <v-layout row>
+                  <v-btn depressed :outline="sBI(equip.glove)" :color="cBR(equip.glove)" class="animated fadeIn" dark>
+                    <template v-if="equip.glove">{{ equip.glove.name }}</template>
+                    <template v-else>장갑</template>
+                  </v-btn>
+                  <v-btn depressed :outline="sBI(equip.armor)" :color="cBR(equip.armor)" class="animated fadeIn" dark>
+                    <template v-if="equip.armor">{{ equip.armor.name }}</template>
+                    <template v-else>갑옷</template>
+                  </v-btn>
+                  <v-btn depressed :outline="sBI(equip.subweapon)" :color="cBR(equip.subweapon)" class="animated fadeIn" dark>
+                    <template v-if="equip.subweapon">{{ equip.subweapon.name }}</template>
+                    <template v-else>보조무기</template>
+                  </v-btn>
+                </v-layout>
+                <v-layout row row>
+                  <v-btn depressed :outline="sBI(equip.accessory)" :color="cBR(equip.accessory)" class="animated fadeIn" dark>
+                    <template v-if="equip.accessory">{{ equip.accessory.name }}</template>
+                    <template v-else>장신구</template>
+                  </v-btn>
+                  <v-btn depressed :outline="sBI(equip.leg)" :color="cBR(equip.leg)" class="animated fadeIn" dark>
+                    <template v-if="equip.leg">{{ equip.leg.name }}</template>
+                    <template v-else>다리</template>
+                  </v-btn>
+                </v-layout>
+
+              </v-container>
+            </template>
+          </v-card>
+        </v-flex>
+        <v-flex d-flex xs12 sm6 md3>
+          <v-layout row wrap>
+            <v-flex d-flex>
+              <v-card color="indigo" dark>
+                <v-card-text>{{ lorem }}</v-card-text>
+              </v-card>
+            </v-flex>
+            <v-flex d-flex>
+              <v-layout row wrap>
+                <v-flex
+                  v-for="n in 2"
+                  :key="n"
+                  d-flex
+                  xs12
+                >
+                  <v-card
+                    color="red lighten-2"
+                    dark
+                  >
+                    <v-card-text>{{ lorem }}</v-card-text>
+                  </v-card>
+                </v-flex>
+              </v-layout>
+            </v-flex>
+          </v-layout>
+        </v-flex>
+      </v-layout>
+    </v-container>
+  </div>
+  `,
+  data() {
+    return {
+      lorem: "asdfjalsdkfj;alskdf;laksjd;lfkjasdlfa"
+    }
+  },
+  methods: {
+    cBR(i) {
+      return colorByRarity(i)
+    },
+    sBI(i) {
+      return styleByItem(i)
+    }
+  },
+  computed: {
+    equip() {
+      let e = user_info.getters.getEquip
+      return e
+    }
+  }
+})
+
 
 Vue.component('main_button', {
   template: `
@@ -305,12 +426,17 @@ Vue.component('main_button', {
       >
       search
       </v-btn>
-      <v-btn @click="move_fn">move</v-btn>
+      <v-btn @click="move_fn">Move</v-btn>
+      <v-btn @click.stop="openDialog = true">Equip</v-btn>
+      <v-dialog v-model="openDialog" max-width="800">
+        <test></test>
+      </v-dialog>
     </div>
   `,
   data() {
     return {
-      loading: false
+      loading: false,
+      openDialog: false
     }
   },
   methods: {
@@ -336,7 +462,7 @@ Vue.component('main_button', {
 Vue.component('move_area', {
   template: `
     <div>
-      <v-btn depressed v-for="i in 10" @click="move_to(i)">Area {{ i }}</v-btn>
+      <v-btn depressed v-for="i in 10" :key="i" @click="move_to(i)">Area {{ i }}</v-btn>
     </div>
   `,
   methods: {

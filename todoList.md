@@ -10,12 +10,16 @@
 
 # item cooltime apply [finished]
 
+# weapon equip success [finished]
 
 
-# DESIGN!!
+# DESIGN!! [ongoing]
+# animated transition [ongoing]
 
+# (중요!) 모든 equip 장비들을 json 파일에서 prop을 equip 으로 주고 equipDetail 로 세부 장비 부위를 표현하자.
+# 조합할때 장비하고 있는 아이템도 같이 세주고 장비를 해제해줘야 한다.
 
-# equipment status show in dialog
+# equipment status show in dialog [ongoing]
 
 # equip window setting
 

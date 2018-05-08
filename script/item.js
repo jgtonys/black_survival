@@ -7,6 +7,38 @@ function itemFind(index) {
   return l.pop();
 }
 
+function colorByRarity(i) {
+  let btnColor = '';
+  if(!i) {
+    return "grey"
+  }
+  let r = i.rarity;
+  switch(true) {
+    case (r > 100):
+      btnColor = "black"; break;
+    case (r > 70):
+      btnColor = "brown"; break;
+    case (r > 30):
+      btnColor = "pink"; break;
+    case (r > 10):
+      btnColor = "indigo"; break;
+    case (r <= 10):
+      btnColor = "deep-purple";break
+  }
+  return btnColor
+}
+
+function styleByItem(i) {
+  if(!i) {
+    return true
+  } else if(i.prop.includes('weapon')) {
+    return false
+  } else if(i.prop.includes('material')) {
+    return true
+  } else {
+    return true
+  }
+}
 
 function itemMapSet() {
   let l = sys_info.getters.getItemList;

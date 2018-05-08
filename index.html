@@ -3,6 +3,7 @@
   <title>b</title>
   <link href='css/vuetify_font.css' rel="stylesheet">
   <link href="css/vuetify.min.css" rel="stylesheet">
+  <link href="css/animate.css" rel="stylesheet">
   <meta http-equiv="content-type" content="text/html; charset=utf-8"/ />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
   <script type="text/javascript" src="script/vue.js"></script>
@@ -14,33 +15,32 @@
       <v-app>
       <v-container fluid grid-list-sm>
         <v-layout row wrap>
-          <v-flex d-flex xs12>
+          <v-flex xs6>
+            <v-card tile flat>
+              <v-card-title>Area #{{ loca }}</v-card-title>
               <v-flex d-flex>
-                <v-card tile flat height="80%">
-                  <v-card-title>Area #{{ loca }}</v-card-title>
-                  <component :is="view"></component>
-                </v-card>
+                <component :is="view"></component>
               </v-flex>
-              <v-layout column xs2>
-                <v-flex d-flex xs5>
-                  <v-card tile flat>
-                    <v-card-text><user_stat></user_stat></v-card-text>
-                  </v-card>
-                </v-flex>
-                <v-flex d-flex xs5>
-                  <v-card tile flat>
-                    <main_button></main_button>
-                  </v-card>
-                </v-flex>
-              </v-layout>
+            </v-card>
           </v-flex>
+          <v-layout column>
+            <v-flex xs5>
+              <v-card tile flat>
+                <v-card-text><user_stat></user_stat></v-card-text>
+              </v-card>
+            </v-flex>
+            <v-flex>
+              <v-card tile flat>
+                <main_button></main_button>
+              </v-card>
+            </v-flex>
+          </v-layout>
         </v-layout>
-        <v-flex d-flex xs12>
+        <v-flex xs12>
           <v-card tile flat>
             <v-card-text><inventory></inventory></v-card-text>
           </v-card>
         </v-flex>
-
       </v-container>
       </v-app>
     </div>

@@ -5,7 +5,16 @@ const user_info = new Vuex.Store({
     hp: 100,
     sta: 100,
     notFind: 20,
-    atk: 5
+    atk: 5,
+    equip: {
+      weapon: '',
+      head: '',
+      glove: '',
+      armor: '',
+      subweapon: '',
+      accessory: '',
+      leg: ''
+    }
   },
   mutations: {
     pushItem (state,item) {
@@ -28,6 +37,15 @@ const user_info = new Vuex.Store({
     },
     changeHp (state,amount) {
       state.hp += parseInt(amount);
+    },
+    changeEquip (state,item) {
+      let prop = item.prop[0];
+      let original = state.equip[prop];
+      if(original) {
+        state.bag.push(original);
+      }
+      state.equip[prop] = item;
+      console.log(state.equip[prop]);
     }
   },
   getters: {
@@ -51,6 +69,9 @@ const user_info = new Vuex.Store({
     },
     getMissRate: state => {
       return state.notFind
+    },
+    getEquip: state => {
+      return state.equip
     }
   }
 })
@@ -96,12 +117,14 @@ const sys_info = new Vuex.Store({
 const time_info = new Vuex.Store({
   state: {
     itemCoolTime: false,
-    itemCoolTimeLeft: 0
+    itemCoolTimeLeft: 0,
+    itemCoolTimeDefault: 0
   },
   mutations: {
     setItemCoolTime (state,payload) {
       state.itemCoolTime = payload[0];
       state.itemCoolTimeLeft = payload[1];
+      state.itemCoolTimeDefault = payload[1];
     },
     cutItemCoolTimeLeft (state) {
       state.itemCoolTimeLeft -= 1;
@@ -126,6 +149,9 @@ const time_info = new Vuex.Store({
     },
     getItemCoolTimeLeft: state => {
       return state.itemCoolTimeLeft
+    },
+    getItemCoolTimeDefault: state => {
+      return state.itemCoolTimeDefault
     }
   }
 })
