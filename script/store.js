@@ -2,8 +2,8 @@ const user_info = new Vuex.Store({
   state: {
     bag: [],
     loca: 1,
-    hp: 100,
-    sta: 100,
+    hp: 50,
+    sta: 30,
     notFind: 20,
     atk: 5,
     equip: {
@@ -37,9 +37,10 @@ const user_info = new Vuex.Store({
     },
     changeHp (state,amount) {
       state.hp += parseInt(amount);
+      console.log(state.hp);
     },
     changeEquip (state,item) {
-      let prop = item.prop[0];
+      let prop = item.equipDetail;
       let original = state.equip[prop];
       if(original) {
         state.bag.push(original);
@@ -80,7 +81,9 @@ const sys_info = new Vuex.Store({
   state: {
     view: '',
     itemList: [],
-    itemMapSet: []
+    itemMapSet: [],
+    mapProp: [],
+    msg: []
   },
   mutations: {
     clearView (state) {
@@ -94,6 +97,20 @@ const sys_info = new Vuex.Store({
     },
     setItemMap (state, list) {
       state.itemMapSet = list
+    },
+    initMapProp (state) { //0이 중립 1이 아군 2가 적군
+      for(let i=1;i<11;i++) {
+        state.mapProp[i] = 0;
+      }
+      state.mapProp[1] = 1; //to be erased
+      state.mapProp[8] = 2; //to be erased
+    },
+    pushMsg (state,m) {
+      state.msg.push(m);
+      console.log(m); //to be erased
+    },
+    eraseMsg (state) {
+      state.msg.splice(0,1);
     }
   },
   getters: {
@@ -110,6 +127,20 @@ const sys_info = new Vuex.Store({
     },
     getFilterItemMap: state => {
       return state.itemMapSet
+    },
+    getMapProp: state => {
+      return state.mapProp
+    },
+    getMsg: state => {
+      return state.msg
+    }
+  },
+  actions: {
+    alertMsg ({commit},m) {
+      commit("pushMsg",m);
+      setTimeout(() => {
+        commit("eraseMsg");
+      }, 1000);
     }
   }
 })
@@ -152,6 +183,52 @@ const time_info = new Vuex.Store({
     },
     getItemCoolTimeDefault: state => {
       return state.itemCoolTimeDefault
+    }
+  }
+})
+
+const enemy_info = new Vuex.Store({
+  state: {
+    hp: 100,
+    atk: 1,
+    enemyAttacking: false,
+    enemyAttackingT: ''
+  },
+  mutations: {
+    setEnemyInfo (state,payload) {
+      state.hp = payload[0];
+      state.atk = payload[1];
+    },
+    setEnemyAttacking (state) {
+      state.enemyAttacking = true;
+      console.log("enemy attacking start");//to be erased
+    },
+    attack (state) {
+      sys_info.dispatch("alertMsg","적의 공격을 받았습니다.");
+      user_info.commit("changeHp",0 - state.atk);
+    },
+    clearEnemyAttacking (state) {
+      state.enemyAttacking = false;
+      sys_info.dispatch("alertMsg","적이 쓰러졌다.");
+      clearInterval(state.enemyAttackingT);
+      console.log("enemy attacking stopped");//to be erased
+    }
+  },
+  actions: { //action can only use one payload, so make it list
+    startEnemyAttack({commit,state}) {
+      commit("setEnemyAttacking",true);
+      state.enemyAttackingT = setInterval(() => {
+        if(state.hp <= 0) {
+          commit("clearEnemyAttacking");
+        } else {
+          commit("attack");
+        }
+      },2000);
+    }
+  },
+  getters: {
+    getHp: state => {
+      return state.hp
     }
   }
 })

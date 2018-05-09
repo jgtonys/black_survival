@@ -17,7 +17,7 @@
         <v-layout row wrap>
           <v-flex xs6>
             <v-card tile flat>
-              <v-card-title>Area #{{ loca }}</v-card-title>
+              <map_data></map_data>
               <v-flex d-flex>
                 <component :is="view"></component>
               </v-flex>
@@ -32,6 +32,7 @@
             <v-flex>
               <v-card tile flat>
                 <main_button></main_button>
+                <system_msg></system_msg>
               </v-card>
             </v-flex>
           </v-layout>

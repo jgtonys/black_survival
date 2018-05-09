@@ -12,11 +12,20 @@
 
 # weapon equip success [finished]
 
+# (중요!) 모든 equip 장비들을 json 파일에서 prop을 equip 으로 주고 equipDetail 로 세부 장비 부위를 표현하자. [finished]
 
 # DESIGN!! [ongoing]
 # animated transition [ongoing]
 
-# (중요!) 모든 equip 장비들을 json 파일에서 prop을 equip 으로 주고 equipDetail 로 세부 장비 부위를 표현하자.
+# 맵에 중립,아군,적군의 점령 상태를 도입 [finished]
+
+# 중립 및 적군 area에 적이 나타나도록 설정 [finished]
+
+# 적 공격 셋팅 [ongoing]
+
+
+###### to be erased 로 검색해서 주석들 지우자
+
 # 조합할때 장비하고 있는 아이템도 같이 세주고 장비를 해제해줘야 한다.
 
 # equipment status show in dialog [ongoing]

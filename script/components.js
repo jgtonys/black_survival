@@ -6,6 +6,56 @@ Vue.component('searching', {
   `
 })
 
+Vue.component('map_data', {
+  template: `
+  <div>
+    <v-card-title>Area #{{ loca }}</v-card-title>
+    <p class="text-xs-right">{{ areaProp }}</p>
+  </div>
+  `,
+  computed: {
+    loca() {
+      let l = user_info.getters.userLoca;
+      let f = sys_info.getters.getMapProp[l];
+      if(f != 1) {
+        enemy_info.dispatch("startEnemyAttack");
+      }
+      return l
+    },
+    areaProp() {
+      let f = sys_info.getters.getMapProp[this.loca];
+      let msg = ''
+      switch(f) {
+        case 0:
+          msg =  "<중립 지역>";break;
+        case 1:
+          msg = "<안전한 지역>";break;
+        case 2:
+          msg = "<적군 지역>";break;
+      }
+      return msg
+    }
+  }
+})
+
+Vue.component('system_msg', {
+  template: `
+  <div class="ma-4">
+    <p v-for="(msg,index) in msgList" class="pa-0 animated slideInUp">{{ msg }}</p>
+  </div>
+  `,
+  computed: {
+    msgList() {
+      return sys_info.getters.getMsg
+    }
+  }
+})
+
+
+
+
+
+
 Vue.component('user_stat', {
   template: `
   <div>
@@ -109,7 +159,7 @@ Vue.component('inventory', {
             @click="use"
           >사용<span slot="loader">{{ itemCoolTimeLeft }}초 남음</span></v-btn>
           <v-btn v-if="itemProperty.prop.includes('material')" color="green darken-1" flat @click="make">조합</v-btn>
-          <v-btn v-if="itemProperty.prop.includes('weapon')" color="green darken-1" flat @click="equip">장착</v-btn>
+          <v-btn v-if="itemProperty.prop.includes('equip')" color="green darken-1" flat @click="equip">장착</v-btn>
           <v-btn color="green darken-1" flat @click="remove">버리기</v-btn>
         </v-card-actions>
       </v-card>
@@ -315,6 +365,25 @@ Vue.component('not_found', {
   `
 })
 
+Vue.component('enemy_occur', {
+  template: `
+  <div class="text-xs-center">
+    <v-card-title>적 등장!</v-card-title>
+    <v-card-text>
+      <p>hp : {{ hp }}</p>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn>공격</v-btn>
+    </v-card-actions>
+  </div>
+  `,
+  computed: {
+    hp() {
+      return enemy_info.getters.getHp
+    }
+  }
+})
+
 Vue.component('test', {
   template: `
   <div>
@@ -449,7 +518,12 @@ Vue.component('main_button', {
       sys_info.commit("changeView",'move_area');
     },
     search_fn() {
-      if(Math.floor(Math.random()*10 > 2)) {
+      let l = user_info.getters.userLoca;
+      let f = sys_info.getters.getMapProp[l];
+      if(f != 1) {
+        sys_info.commit("changeView",'enemy_occur');
+      }
+      else if(Math.floor(Math.random()*10 > 2)) {
         sys_info.commit("changeView",'item_occur');
       } else {
         sys_info.commit("changeView",'not_found');

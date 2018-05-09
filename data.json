@@ -7,17 +7,21 @@ list = [
       ]},
     {"id":4,"rarity":30,"gen":[1],"name":"접시","prop":["material"],"upgradeTo":[7]},
     {"id":5,"rarity":40,"gen":[1],"name":"잡초","prop":["consume"],"consumeDetail":["hp","sta"],"consumeAmount":[3,2],"coolTime":8},
-    {"id":6,"rarity":20,"gen":[4],"name":"펜","prop":["weapon"],"atk":2},
+    {"id":6,"rarity":20,"gen":[4],"name":"펜","prop":["equip"],"equipDetail":"weapon","atk":2},
     {"id":7,"rarity":10,"gen":[3],"name":"접시에 담긴 빵","prop":["consume"],"consumeDetail":["hp"],"consumeAmount":[20],"coolTime":8,"recipe":[
       {"id":1,"ct":1},{"id":4,"ct":1}
       ]},
     {"id":8,"rarity":10,"gen":[5],"name":"물빵","prop":["consume"],"consumeDetail":["hp","sta"],"consumeAmount":[10,5],"coolTime":8,"recipe":[
       {"id":0,"ct":2},{"id":1,"ct":1}
       ]},
-    {"id":9,"rarity":50,"gen":[1],"name":"나뭇가지","prop":["weapon","material"],"atk":3,"upgradeTo":[11]},
-    {"id":10,"rarity":40,"gen":[2],"name":"청 테이프","prop":["glove","material"],"def":2,"upgradeTo":[11]},
-    {"id":11,"rarity":20,"gen":[9],"name":"테이프로 감은 몽둥이","prop":["weapon"],"atk":6,"recipe":[
+    {"id":9,"rarity":50,"gen":[1],"name":"나뭇가지","prop":["equip","material"],"equipDetail":"weapon","atk":3,"upgradeTo":[11]},
+    {"id":10,"rarity":40,"gen":[2],"name":"청 테이프","prop":["equip","material"],"equipDetail":"glove","def":2,"upgradeTo":[11]},
+    {"id":11,"rarity":20,"gen":[9],"name":"테이프로 감은 몽둥이","prop":["equip"],"equipDetail":"weapon","atk":6,"recipe":[
       {"id":9,"ct":3},{"id":10,"ct":2}
       ]},
-    {"id":12,"rarity":50,"gen":[5],"name":"박스","prop":["head"],"def":1}
+    {"id":12,"rarity":50,"gen":[5],"name":"박스","prop":["equip"],"equipDetail":"head","def":1},
+    {"id":13,"rarity":70,"gen":[1],"name":"천 조각","prop":["material"],"upgradeTo":[14]},
+    {"id":14,"rarity":50,"gen":[9],"name":"거지 옷","prop":["equip"],"equipDetail":"armor","def":3,"recipe":[
+      {"id":13,"ct":3}
+      ]},
   ]

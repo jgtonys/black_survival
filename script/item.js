@@ -31,7 +31,7 @@ function colorByRarity(i) {
 function styleByItem(i) {
   if(!i) {
     return true
-  } else if(i.prop.includes('weapon')) {
+  } else if(i.prop.includes('equip')) {
     return false
   } else if(i.prop.includes('material')) {
     return true
